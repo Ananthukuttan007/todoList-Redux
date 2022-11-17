@@ -1,45 +1,57 @@
-import React, { useState } from 'react'
-import { useDispatch, useSelector } from "react-redux"
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import { add_todo, delete_todo } from './Redux/todoSlice';
 
-function TodoList() {
-    const list = useSelector(state => state.list.value)
-    const dispatch = useDispatch()
-    const [input, setInput] = useState();
-    const DeleteTodo = (e) => {
-        console.log(e.target.value)
-        const newList = list.filter((elem) => elem.id != e.target.value)
-        console.log(newList)
-        dispatch(delete_todo({
-            list: newList
-        }))
+
+class TodoList extends Component {
+    state = {
+        input: ""
     }
-    return (
-        <>
-            <div className="main-div">
-                <div className="child-div">
-                    <figure>
-                        <figcaption>Add your list here</figcaption>
-                    </figure>
-                    <div className="add-items">
-                        <input type="text" placeholder='Type the task'
-                            onChange={(e) => setInput(e.target.value)} />
-                        <button onClick={() => dispatch(add_todo({
-                            list: [...list, { id: Math.random(), data: input }]
-                        }))} >Submit</button>
-                        {list.map(task => {
-                            return (
+    DeleteTodo = (e) => {
+        const newList = this.props.list.filter((elem) => elem.id != e.target.value)
+        this.props.delete_todo({
+            list: newList
+        })
+    }
+    render() {
+        return (
+            <>
+                <div className="main-div">
+                    <div className="child-div">
+                        <figure>
+                            <figcaption>Add your list here</figcaption>
+                        </figure>
+                        <div className="add-items">
+                            <div>
+                                <input required type="text" placeholder='Type the task'
+                                    onChange={(e) => this.setState({ input: e.target.value })} />
+                                <button onClick={() => {
+                                    // this.state.input ?
+                                    this.props.add_todo({
+                                        list: [...this.props.list, { id: Math.random(), data: this.state.input }]
+                                    })
+                                    this.setState({ input: "" })
+                                    // : alert("Type Something")
+                                }} >Submit</button>
+                            </div>
+                            {this.props.list.map(task => {
+                                return (
 
-                                <div key={task.id}>{task.data} <button value={task.id} onClick={DeleteTodo}>Delete</button></div>
+                                    <div key={task.id}>{task.data} <button value={task.id} onClick={this.DeleteTodo}>Delete</button></div>
 
 
-                            )
-                        })}
+                                )
+                            })}
+                        </div>
                     </div>
                 </div>
-            </div>
-        </>
-    )
+            </>
+        )
+    }
 }
-
-export default TodoList
+function mapStateToProps(state) {
+    return {
+        list: state.list.value
+    }
+}
+export default connect(mapStateToProps, { add_todo, delete_todo })(TodoList);
