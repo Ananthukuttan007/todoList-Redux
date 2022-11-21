@@ -13,6 +13,18 @@ class TodoList extends Component {
             list: newList
         })
     }
+    AddTodo() {
+        if (this.state.input) {
+
+            this.props.add_todo({
+                list: [...this.props.list, { id: Math.random(), data: this.state.input }]
+            })
+            this.setState((prev) => ({ input: "" }))
+        }
+        else {
+            alert("Type Something")
+        }
+    }
     render() {
         return (
             <>
@@ -24,15 +36,11 @@ class TodoList extends Component {
                         <div className="add-items">
                             <div>
                                 <input required type="text" placeholder='Type the task'
+                                    value={this.state.input}
                                     onChange={(e) => this.setState({ input: e.target.value })} />
-                                <button onClick={() => {
-                                    // this.state.input ?
-                                    this.props.add_todo({
-                                        list: [...this.props.list, { id: Math.random(), data: this.state.input }]
-                                    })
-                                    this.setState({ input: "" })
-                                    // : alert("Type Something")
-                                }} >Submit</button>
+                                <button onClick={
+                                    this.AddTodo.bind(this)
+                                } >Submit</button>
                             </div>
                             {this.props.list.map(task => {
                                 return (
